@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Camera and Face Detection</title>
+    <script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+  </head>
+  <body>
+    <video id="videoElement" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+
+    <script type="text/javascript">
+      function onOpenCvReady() {
+        const videoElement = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+
+        function startVideo() {
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+              videoElement.srcObject = stream;
+              setInterval(() => {
+                context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                const src = cv.imread(canvas);
+                const gray = new cv.Mat();
+                cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+                // 顔検出を実行
+                const faceCascade = new cv.CascadeClassifier();
+                faceCascade.load('haarcascade_frontalface_default.xml');
+                const faces = new cv.RectVector();
+                faceCascade.detectMultiScale(gray, faces);
+
+                // 検出された顔を囲む四角を描画
+                for (let i = 0; i < faces.size(); ++i) {
+                  const face = faces.get(i);
+                  const point1 = new cv.Point(face.x, face.y);
+                  const point2 = new cv.Point(face.x + face.width, face.y + face.height);
+                  cv.rectangle(src, point1, point2, [255, 0, 0, 255]);
+                }
+
+                cv.imshow(canvas, src);
+
+                gray.delete();
+                faces.delete();
+                faceCascade.delete();
+                src.delete();
+              }, 1000 / 30); // 30fpsで処理する場合は、1000 / 30ミリ秒ごとに処理を行う
+            })
+            .catch((error) => {
+              console.error('Error accessing the camera: ', error);
+            });
+        }
+
+        startVideo();
+      }
+    </script>
+  </body>
+</html>
