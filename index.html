@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Google Search Console -->
     <meta name="google-site-verification" content="ls7kuvIKSqVa_dcixqKvFwl393swvYMkHCkG-xtlCj0">
-    <title>Practice OpenCV.js 2</title>
+    <title>Maitake Face</title>
     <link rel="icon" href="https://neos21.github.io/favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@neos21/neos-normalize@2.0.1/neos-normalize.min.css">
     <!-- Global Site Tag (gtag.js) - Google Analytics -->
@@ -21,53 +21,22 @@
   box-sizing: border-box;
 }
 
-body {
-  margin: 1rem;
-  color: #000;
-  background: #fff;
-}
-
-h1 {
-  font-size: 1.2rem;
-  margin: 0;
-}
-
-p {
-  margin: 0 0 1rem;
-}
-
-h2 {
-  font-size: 1rem;
-  margin: 0;
-}
-
-.preview {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin: 0 0 1rem;
-}
-
-.preview > div {
-  border-right: 1rem solid #fff;  /* Force Margin */
-}
-
 #video {
-  background: #ffc;
+  display: none;
 }
 
 #canvas {
-  background: #cff;
+  background: azure;
 }
 
 #error-message {
-  color: #f00;
+  color: tomato;
 }
 
     </style>
   </head>
   <body>
 
-<h1>Practice OpenCV.js 2</h1>
 <p>
   <button id="start" type="button" disabled>Start</button>
   <button id="stop" type="button" disabled>Stop</button>
@@ -75,18 +44,14 @@ h2 {
   <span id="error-message"></span>
 </p>
 
-<div class="preview">
-  <div>
-    <h2>Raw Video</h2>
-    <div><video id="video" width="640" height="480" playsinline muted autoplay></video></div>
-  </div>
-  <div>
-    <h2>OpenCV Canvas (Face Detection)</h2>
-    <div><canvas id="canvas" width="640" height="480"></canvas></div>
-  </div>
+<div>
+  <video id="video" width="640" height="480" playsinline muted autoplay></video>
 </div>
 
-<p><a href="index.html">Back To Index</a></p>
+<div>
+  <canvas id="canvas" width="640" height="480"></canvas>
+</div>
+
 
 <script>
 
@@ -121,16 +86,12 @@ const faceCascadeFile = './haarcascade_frontalface_default.xml';
 
 /** On OpenCV.js Loaded */
 function onCvLoaded() {
-  console.log('on OpenCV.js Loaded', cv);
-  
   cv.onRuntimeInitialized = onReady;  // Not Working...
   statusElem.innerText = 'On OpenCV.js Loaded';
 }
 
 /** On Ready */
-function onReady() {
-  console.log('On Ready');
-  
+function onReady() { 
   // Set Element Size
   videoElem.width  = canvasElem.width  = width;
   videoElem.height = canvasElem.height = height;
@@ -139,7 +100,6 @@ function onReady() {
   // Load XML File With XHR
   const utils = new Utils('error-message');  // Set Element ID
   utils.createFileFromUrl(faceCascadeFile, faceCascadeFile, () => {
-    console.log('Face Cascade File Loaded');
   });
   // Set Button Events
   startButtonElem.addEventListener('click', onStart);
@@ -151,9 +111,7 @@ function onReady() {
 };
 
 /** On Window Loaded */
-window.addEventListener('load', () => {
-  console.log('Window Loaded');
-  
+window.addEventListener('load', () => { 
   onReady();  // cv.onRuntimeInitialized Is Not Working, So This Is Fallback
 });
 
@@ -163,9 +121,7 @@ function onStart() {
     video: true,
     audio: false
   })
-    .then((_stream) => {
-      console.log('On Start : Success');
-      
+    .then((_stream) => {     
       stream = videoElem.srcObject = _stream;
       videoElem.play();
       
@@ -185,14 +141,11 @@ function onStart() {
       stopButtonElem.disabled  = false;
     })
     .catch((error) => {
-      console.error('On Start : Error', error);
     });
 }
 
 /** On Stop */
-function onStop() {
-  console.log('On Stop');
-  
+function onStop() {  
   videoElem.pause();
   videoElem.srcObject = null;
   stream.getVideoTracks()[0].stop();
@@ -204,9 +157,7 @@ function onStop() {
 
 /** Process Video */
 function processVideo() {
-  if(!isStreaming) {
-    console.log('Process Video : Streaming Stopped');
-    
+  if(!isStreaming) {    
     matSrc.delete();
     matDst.delete();
     matGrey.delete();
